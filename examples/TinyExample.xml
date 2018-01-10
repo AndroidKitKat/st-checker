@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<requirement id="alc_tsu_ext.1.1d" xmlns:h="http://example.com">
+
+  <title>
+
+	  The OS shall implement the requirements in TLS (<linkref linkend="FCS_TLSC_EXT.1"/>) for the DTLS implementation, except where variations are allowed according to DTLS 1.2 (RFC 6347).
+        </title>
+</requirement>
