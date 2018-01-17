@@ -77,6 +77,8 @@ def descend(root):
             elif node.tagName == "title":
                 ret+="<div data-id='" + node.parentNode.getAttribute('id') + "'>"
                 ret+=title_to_form(node)
+                ret+="<br></br>"
+                ret+="<textarea rows='5' cols='70' class='notes'></textarea>"
                 ret+="</div>\n"
                 
             ret+=descend(node)
@@ -95,18 +97,79 @@ form =  "<html xmlns:h='http://www.w3.org/1999/xhtml'>\n   <head>"
 form += "<meta charset='utf-8'></meta><title>"+root.getAttribute("name")+"</title>"
 form += """
        <style type="text/css">
-:disabled{
-   color : #DDDDDD;
-}
        </style>
        <script type='text/javascript'>
 
+const AMPERSAND=String.fromCharCode(38);
+const LT=String.fromCharCode(60);
+
 function generateReport(){
-    report = "<abc/>";
-    initiateDownload('Report.xml', report);
+    var report = LT+"?xml version='1.0' encoding='utf-8'?>\\n"
+    report += LT+"report xmlns='https://niap-ccevs.org/cc/pp/report/v1'"
+    report += generateReportHelper(document.body);
+    report += LT+"/report>"
+    initiateDownload('Report.text', report);
+}
+function getRequirements(nodes){
+  ret="";
+  var bb=0;
+  for(bb=0; bb!=nodes.length; bb++){
+    ret+=getRequirement(nodes[bb]);
+  }
+  return ret;
+}
+
+function getRequirement(node){
+    var ret = ""
+    if(node.nodeType==1){
+       if(node.getAttribute("type") == "checkbox"){
+           console.log
+           ret+=LT+"selectable"; 
+           if(node.checked){
+              ret+=" selected='yes'"
+           }
+           ret+=">"+getRequirements(node.children);
+           ret+=LT+"/selectable>";
+       }
+       else if(node.getAttribute("class") == "selectables"){
+           ret+=LT+"selectables>"
+           console.log("Running through " + node.children.length);
+           ret+=getRequirements(node.children);
+           ret+=LT+"/selectables>"
+       }
+       else if(node.tagName == "textarea"){
+           ret+=LT+"assignment>";
+           ret+=getRequirements(node.children);
+           ret+=LT+"/assignment>\\n";
+       }
+    }
+    else if(node.nodeType==3){
+       return node.textContent;
+    }
+    return ret;
+}
+
+function generateReportHelper(root){
+   var ret=""
+   var reqid = root.getAttribute('data-id');
+   if( reqid ){
+      ret+=LT+"req id='"+reqid+"'>";
+      ret+=getRequirements(root.children);
+      ret+=LT+"/req>\\n";
+      return ret;
+   }
+   else{
+      var children = root.children;
+      var aa;
+      for (aa=0; aa!=children.length; aa++){
+         ret += generateReportHelper(children[aa]);
+      }
+      return ret;
+   }
 }
 
 function initiateDownload(filename, data) {
+
     var blob = new Blob([data], {type: 'text/xml'});
     if(window.navigator.msSaveOrOpenBlob) {
         window.navigator.msSaveBlob(blob, filename);
