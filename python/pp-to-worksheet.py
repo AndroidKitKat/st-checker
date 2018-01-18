@@ -8,6 +8,7 @@ from xml.dom import minidom
 from xml.sax.saxutils import escape
 
 
+
 def node_to_text(node):
     ret=""
     if node.nodeType == xml.dom.Node.TEXT_NODE:
@@ -17,16 +18,19 @@ def node_to_text(node):
         if node.tagName == "selectables":
             sels=[]
             contentCtr=0
-            ret+="<span class='selectables'>"
-            for child in node.childNodes: # Hopefully only seletable
+            ret+="<span class='selectables' data-rindex='"+ +">"
+            rindex=0
+            for child in node.childNodes: # Hopefully only selectable
                 if child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "selectable":
                     contents = title_to_form(child)
                     contentCtr+=len(contents)
                     chk = "<input type='checkbox'"
                     if child.getAttribute("exclusive") == "yes":
-                        chk += " onclick='chooseMe(this)'"
-                    chk +=">"+ contents+"</input>\n"
+                        chk += " onchange='chooseMe(this)'"
+                    chk+= " data-rindex='"+str(rindex)
+                    chk +="'>"+ contents+"</input>\n";
                     sels.append(chk)
+                    rindex+=1
             if contentCtr < 50:
                 for sel in sels:
                     ret+= sel
@@ -37,7 +41,7 @@ def node_to_text(node):
                 ret+="</ul>\n"
             ret+="</span>"
         elif node.tagName == "assignable":
-            ret += "<textarea rows='1' placeholder='"
+            ret += "<textarea class='assignment' rows='1' placeholder='"
             ret += ' '.join(title_to_form(node).split())
             ret +="'></textarea>"
                 
@@ -77,8 +81,8 @@ def descend(root):
             elif node.tagName == "title":
                 ret+="<div data-id='" + node.parentNode.getAttribute('id') + "'>"
                 ret+=title_to_form(node)
-                ret+="<br></br>"
-                ret+="<textarea rows='5' cols='70' class='notes'></textarea>"
+                # ret+="<br></br>"
+                # ret+="<textarea rows='5' cols='70' class='notes'></textarea>"
                 ret+="</div>\n"
                 
             ret+=descend(node)
@@ -93,7 +97,7 @@ if len(sys.argv) != 2:
 
 # Parse the PP
 root = minidom.parse(sys.argv[1]).documentElement
-form =  "<html xmlns:h='http://www.w3.org/1999/xhtml'>\n   <head>"
+form =  "<html xmlns='http://www.w3.org/1999/xhtml'>\n   <head>"
 form += "<meta charset='utf-8'></meta><title>"+root.getAttribute("name")+"</title>"
 form += """
        <style type="text/css">
@@ -105,7 +109,7 @@ const LT=String.fromCharCode(60);
 
 function generateReport(){
     var report = LT+"?xml version='1.0' encoding='utf-8'?>\\n"
-    report += LT+"report xmlns='https://niap-ccevs.org/cc/pp/report/v1'"
+    report += LT+"report xmlns='https://niap-ccevs.org/cc/pp/report/v1'>"
     report += generateReportHelper(document.body);
     report += LT+"/report>"
     initiateDownload('Report.text', report);
@@ -114,6 +118,7 @@ function getRequirements(nodes){
   ret="";
   var bb=0;
   for(bb=0; bb!=nodes.length; bb++){
+    console.log("Here "+ bb);
     ret+=getRequirement(nodes[bb]);
   }
   return ret;
@@ -123,13 +128,12 @@ function getRequirement(node){
     var ret = ""
     if(node.nodeType==1){
        if(node.getAttribute("type") == "checkbox"){
-           console.log
-           ret+=LT+"selectable"; 
+           console.log("CHECKBOX!!");
            if(node.checked){
-              ret+=" selected='yes'"
+              ret+=LT+"selectable index='"+node.getAttribute('data-rindex')+"'>"; 
+              ret+=getRequirements(node.children);
+              ret+=LT+"/selectable>";
            }
-           ret+=">"+getRequirements(node.children);
-           ret+=LT+"/selectable>";
        }
        else if(node.getAttribute("class") == "selectables"){
            ret+=LT+"selectables>"
@@ -137,14 +141,21 @@ function getRequirement(node){
            ret+=getRequirements(node.children);
            ret+=LT+"/selectables>"
        }
-       else if(node.tagName == "textarea"){
+       else if(node.getAttribute("class") == "assignment"){
            ret+=LT+"assignment>";
            ret+=getRequirements(node.children);
            ret+=LT+"/assignment>\\n";
        }
+       else{
+           ret+=getRequirements(node.children);
+       }
     }
     else if(node.nodeType==3){
+       console.log("Made it through here");
        return node.textContent;
+    }
+    else{
+       console.log("IT was something else:" + node.nodeType);
     }
     return ret;
 }
@@ -185,9 +196,11 @@ function initiateDownload(filename, data) {
 }
 
 function chooseMe(sel){
+   console.log("I'm here");
    var common = sel.parentNode;
    while( common.tagName != "SPAN" ){
       common = common.parentNode;
+      console.log("tagName: " + common.tagName);
    }
    toggleFirstCheckboxExcept(common, sel);
 }

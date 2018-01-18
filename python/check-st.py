@@ -18,7 +18,8 @@ def string_to_regex(str):
     ret =  re.sub(r'\“', r'\“', ret) 
     ret =  re.sub(r'\”', r'\”', ret) 
     return ret
-    
+
+
 def title_to_regex(title):
     ret=""
     for node in title.childNodes:
@@ -41,16 +42,24 @@ def title_to_regex(title):
     return ret
             
 
-def descend(root):
-    ret=[]
+def gleanRegexesFromTree(root):
+    ret={}
     for node in root.childNodes:
         if node.nodeType == xml.dom.Node.ELEMENT_NODE:
             if node.tagName == "title":
-                ret.append(title_to_regex(node))
-#                ret.append( re.sub(r"(\\s\+)+", "\s+", title_to_regex(node) ) )
+                id = node.parentNode.getAttribute("id")
+                component = node.parentNode.parentNode
+                if component.tagName == "group":
+                    component = component.parentNode
+                depends = component.getElementsByTagName("selection-depends")
+                for depend in depends:
+                    print(id + " depends on " + depend.getAttribute("ids"))
+                ret[id]=title_to_regex(node)
             else:
-                ret.extend(descend(node))
+                for k,v in gleanRegexesFromTree(node).items():
+                    ret[k] = v 
     return ret
+
 
 # Returns the text content of this node
 def removeMatches(root, regexs):
@@ -61,10 +70,12 @@ def removeMatches(root, regexs):
         elif node.nodeType == xml.dom.Node.ELEMENT_NODE:
             # Run it against our children
             content = removeMatches(node, regexs)
-            for regex in regexs:
+            zombies=[]
+            for id, regex in regexs.items():
                 if re.match(regex, re.sub(r"\s+", '', content)):
-#                    print("Match "+content)
-                    regexs.remove(regex)
+                    zombies.append(id)
+            for zombie in zombies:
+                del regexes[zombie]
             ret = ret + content
     return ret
 
@@ -76,7 +87,7 @@ if len(sys.argv) != 3:
 
 
 dom = minidom.parse(sys.argv[1])
-regexes = descend(dom.documentElement)
+regexes = gleanRegexesFromTree(dom.documentElement)
 
 
 dom = minidom.parse(sys.argv[2])

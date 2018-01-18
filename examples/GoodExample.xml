@@ -289,12 +289,8 @@
       </requirement>
       <requirement id="fpt_aslr_ext.1.1">
 	<title>The OS shall always randomize process address space memory locations with 
-	    <selectables>
-	      <selectable>8</selectable>
-	      <selectable><assignable>number greater than 8</assignable></selectable>
-	    </selectables>
-	    bits of entropy except for
-                <assignable>list of explicit exceptions</assignable>.
+	[ 8 ] bits of entropy except for
+        [ none].
         </title>
       </requirement>
       <requirement id="fpt_aslr_ext.1.2" status="optional">
