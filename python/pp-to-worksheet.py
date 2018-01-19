@@ -7,86 +7,133 @@ import xml.dom.minidom
 from xml.dom import minidom
 from xml.sax.saxutils import escape
 
+class State:
+    def __init__(self):
+        # Maps selection IDs to Requirements
+        # If the selection is made, then the requirement is included
+        self.selMap={}
+        # Maps component IDs to sections
+        self.compMap={}
+        # Current index for the selectables
+        self.selectables_index=0
+
+    def node_to_text(self, node):
+        ret=""
+        if node.nodeType == xml.dom.Node.TEXT_NODE:
+            ret += escape(node.data)
+        elif node.nodeType == xml.dom.Node.ELEMENT_NODE:
+            # sys.stderr.write("Tagname is"+ node.tagName)
+            if node.tagName == "selectables":
+                sels=[]
+                contentCtr=0
+                ret+="<span class='selectables' data-rindex='"+ str(self.selectables_index) +"'>"
+                self.selectables_index+=1
+                rindex=0
+                for child in node.childNodes: # Hopefully only selectable
+                    if child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "selectable":
+                        contents = self.title_to_form(child)
+                        contentCtr+=len(contents)
+                        chk = "<input type='checkbox'"
+                        onChange=""
+                        classes=""
+                        if child.getAttribute("exclusive") == "yes":
+                            onChange+="chooseMe(this);"
+                        id=child.getAttribute("id")
+                        if id!="" and id in self.selMap:
+                            onChange+="updateDependency(this,"
+                            delim="["
+                            for sel in self.selMap[id]:
+                                classes=sel+"_m "
+                                onChange+=delim+"\""+sel+"\""
+                                delim=","
+                            onChange+="]);"
+                        chk+= " onchange='"+onChange+"'";
+                        chk+= " data-rindex='"+str(rindex)+"'"
+                        chk +=" class='"+classes+"'"
+                        chk +=">"+ contents+"</input>\n";
+                        sels.append(chk)
+                        rindex+=1
+                if contentCtr < 50:
+                    for sel in sels:
+                        ret+= sel
+                else:
+                    ret+="<ul>\n"
+                    for sel in sels:
+                        ret+= "<li>"+sel+"</li>\n"
+                    ret+="</ul>\n"
+                ret+="</span>"
+            elif node.tagName == "assignable":
+                ret += "<textarea class='assignment' rows='1' placeholder='"
+                ret += ' '.join(self.title_to_form(node).split())
+                ret +="'></textarea>"
+
+            elif node.tagName == "abbr" or node.tagName == "linkref":
+                ret += node.getAttribute("linkend")
+            elif node.tagName == "h:strike":
+                pass
+            elif ":" in node.tagName:
+                tag = re.sub(r'.*:', '', node.tagName)
+                ret += "<"+tag
+                attrs = node.attributes
+                for aa in range(0,attrs.length) :
+                    attr =attrs.item(aa)
+                    ret+=" " + attr.name + "='" + escape(attr.value) +"'"
+                ret += ">"
+                ret += self.title_to_form(node)
+                ret += "</"+tag+">"
+        return ret
 
 
-def node_to_text(node):
-    ret=""
-    if node.nodeType == xml.dom.Node.TEXT_NODE:
-        ret += escape(node.data)
-    elif node.nodeType == xml.dom.Node.ELEMENT_NODE:
-        # sys.stderr.write("Tagname is"+ node.tagName)
-        if node.tagName == "selectables":
-            sels=[]
-            contentCtr=0
-            ret+="<span class='selectables' data-rindex='"+ +">"
-            rindex=0
-            for child in node.childNodes: # Hopefully only selectable
-                if child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "selectable":
-                    contents = title_to_form(child)
-                    contentCtr+=len(contents)
-                    chk = "<input type='checkbox'"
-                    if child.getAttribute("exclusive") == "yes":
-                        chk += " onchange='chooseMe(this)'"
-                    chk+= " data-rindex='"+str(rindex)
-                    chk +="'>"+ contents+"</input>\n";
-                    sels.append(chk)
-                    rindex+=1
-            if contentCtr < 50:
-                for sel in sels:
-                    ret+= sel
-            else:
-                ret+="<ul>\n"
-                for sel in sels:
-                    ret+= "<li>"+sel+"</li>\n"
-                ret+="</ul>\n"
-            ret+="</span>"
-        elif node.tagName == "assignable":
-            ret += "<textarea class='assignment' rows='1' placeholder='"
-            ret += ' '.join(title_to_form(node).split())
-            ret +="'></textarea>"
-                
-        elif node.tagName == "abbr" or node.tagName == "linkref":
-            ret += node.getAttribute("linkend")
-        elif node.tagName == "h:strike":
-            pass
-        elif ":" in node.tagName:
-            tag = re.sub(r'.*:', '', node.tagName)
-            ret += "<"+tag
-            attrs = node.attributes
-            for aa in range(0,attrs.length) :
-                attr =attrs.item(aa)
-                ret+=" " + attr.name + "='" + escape(attr.value) +"'"
-            ret += ">"
-            ret += title_to_form(node)
-            ret += "</"+tag+">"
-    return ret
+    def makeSelectionMap(self, root):
+        for element in root.getElementsByTagNameNS('https://niap-ccevs.org/cc/v1', 
+                                                   'selection-depends'):
+            # req=element.getAttribute("req");
+            selIds=element.getAttribute("ids");
+            slaveId=element.parentNode.getAttribute("id");
+            for selId in selIds.split(','):
+                reqs=[]
+                if selId in self.selMap:
+                    reqs =self.selMap[selId];
+                reqs.append(slaveId)
+                self.selMap[selId]=reqs
 
-def title_to_form(title):
-    ret=""
-    for node in title.childNodes:
-        ret+=node_to_text(node)
-    return ret
-            
 
-def descend(root):
-    ret=""
-    for node in root.childNodes:
-        if node.nodeType == xml.dom.Node.ELEMENT_NODE:
-            if node.tagName == "section":
-                idAttr=node.getAttribute("id")
-                if "SFRs" == idAttr or "SARs" == idAttr:
-                    ret+="<h2>"+node.getAttribute("title")+"</h2>\n"
-            elif node.tagName == "f-component" or node.tagName == "a-component":
-                ret+="<h3>"+node.getAttribute("name")+"</h3>\n"
-            elif node.tagName == "title":
-                ret+="<div data-id='" + node.parentNode.getAttribute('id') + "'>"
-                ret+=title_to_form(node)
-                # ret+="<br></br>"
-                # ret+="<textarea rows='5' cols='70' class='notes'></textarea>"
-                ret+="</div>\n"
-                
-            ret+=descend(node)
-    return ret
+
+    def title_to_form(self, title):
+        ret=""
+        for node in title.childNodes:
+            ret+=self.node_to_text(node)
+        return ret
+
+    def descend(self, root):
+        ret=""
+        for node in root.childNodes:
+            if node.nodeType == xml.dom.Node.ELEMENT_NODE:
+                if node.tagName == "section":
+                    idAttr=node.getAttribute("id")
+                    if "SFRs" == idAttr or "SARs" == idAttr:
+                        ret+="<h2>"+node.getAttribute("title")+"</h2>\n"
+                elif node.tagName == "f-component" or node.tagName == "a-component":
+                    ret+="<div id='"+node.getAttribute("id")+"'"
+                    # The only direct descendants are possible should be the children
+                    child=node.getElementsByTagNameNS('https://niap-ccevs.org/cc/v1', 
+                                                'selection-depends')
+                    if child.length > 0:
+                        ret+=" class='disabled'"
+                    ret+=">"
+                    ret+="<h3>"+node.getAttribute("name")+"</h3>\n"
+                    ret+=self.descend(node)
+                    ret+="</div>"
+                    continue
+                elif node.tagName == "title":
+                    self.selectables_index=0
+                    ret+="<div id='"+node.parentNode.getAttribute('id') +"' data-id='" + node.parentNode.getAttribute('id') + "'>"
+                    ret+=self.title_to_form(node)
+                    # ret+="<br></br>"
+                    # ret+="<textarea rows='5' cols='70' class='notes'></textarea>"
+                    ret+="</div>\n"
+                ret+=self.descend(node)
+        return ret
 
 
 
@@ -97,10 +144,19 @@ if len(sys.argv) != 2:
 
 # Parse the PP
 root = minidom.parse(sys.argv[1]).documentElement
+
+state=State()
+
+state.makeSelectionMap(root);
+
 form =  "<html xmlns='http://www.w3.org/1999/xhtml'>\n   <head>"
 form += "<meta charset='utf-8'></meta><title>"+root.getAttribute("name")+"</title>"
 form += """
        <style type="text/css">
+           .disabled {
+              opacity: .2;
+	      pointer-events: none;
+           }
        </style>
        <script type='text/javascript'>
 
@@ -118,7 +174,6 @@ function getRequirements(nodes){
   ret="";
   var bb=0;
   for(bb=0; bb!=nodes.length; bb++){
-    console.log("Here "+ bb);
     ret+=getRequirement(nodes[bb]);
   }
   return ret;
@@ -128,7 +183,6 @@ function getRequirement(node){
     var ret = ""
     if(node.nodeType==1){
        if(node.getAttribute("type") == "checkbox"){
-           console.log("CHECKBOX!!");
            if(node.checked){
               ret+=LT+"selectable index='"+node.getAttribute('data-rindex')+"'>"; 
               ret+=getRequirements(node.children);
@@ -137,13 +191,16 @@ function getRequirement(node){
        }
        else if(node.getAttribute("class") == "selectables"){
            ret+=LT+"selectables>"
-           console.log("Running through " + node.children.length);
            ret+=getRequirements(node.children);
            ret+=LT+"/selectables>"
        }
        else if(node.getAttribute("class") == "assignment"){
+           var val = "";
+           if(node.value){
+             val=node.value;
+           }
            ret+=LT+"assignment>";
-           ret+=getRequirements(node.children);
+           ret+=val;
            ret+=LT+"/assignment>\\n";
        }
        else{
@@ -151,11 +208,7 @@ function getRequirement(node){
        }
     }
     else if(node.nodeType==3){
-       console.log("Made it through here");
        return node.textContent;
-    }
-    else{
-       console.log("IT was something else:" + node.nodeType);
     }
     return ret;
 }
@@ -196,13 +249,38 @@ function initiateDownload(filename, data) {
 }
 
 function chooseMe(sel){
-   console.log("I'm here");
    var common = sel.parentNode;
    while( common.tagName != "SPAN" ){
       common = common.parentNode;
-      console.log("tagName: " + common.tagName);
    }
    toggleFirstCheckboxExcept(common, sel);
+}
+
+var selbasedCtrs={}
+
+function updateDependency(root, ids){
+   var aa, bb;
+   console.log("Here");
+
+   var delta=root.checked?1:-1;
+   for(aa=0; ids.length>aa; aa++){
+      id=ids[aa];
+     
+      var masters = document.getElementsByClassName(id+"_m");
+      enabled=false;
+      console.log("Checking " + masters.length);
+      for(bb=0; masters.length>bb; bb++){
+            if (masters[bb].checked){
+                enabled=true;
+            }
+      }
+      if(enabled){
+         document.getElementById(id).classList.remove('disabled');
+      }
+      else{
+         document.getElementById(d).classList.add('disabled');
+      }
+   }
 }
 
 function toggleFirstCheckboxExcept(root, exc){
@@ -225,7 +303,7 @@ function toggleFirstCheckboxExcept(root, exc){
 
 form +=  "      <h1>Worksheet for the " + root.getAttribute("name") + "</h1>"
 
-form += descend(root)
+form += state.descend(root)
 form += """
       <br/>
       <button type="button" onclick="generateReport()">Generate Report</button>
