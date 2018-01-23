@@ -16,6 +16,8 @@ class State:
         self.compMap={}
         # Current index for the selectables
         self.selectables_index=0
+        # index
+        self.index=""
 
     def node_to_text(self, node):
         ret=""
@@ -115,6 +117,8 @@ class State:
                         ret+="<h2>"+node.getAttribute("title")+"</h2>\n"
                 elif node.tagName == "f-component" or node.tagName == "a-component":
                     id=node.getAttribute("id")
+                    self.index+="<a href='#"+id+"'>"+id+"</a><br/>\n"
+
                     ret+="<div id='"+id+"'"
                     # The only direct descendants are possible should be the children
                     child=node.getElementsByTagNameNS('https://niap-ccevs.org/cc/v1', 
@@ -162,21 +166,39 @@ form += """
 .disabled *{
    display: none;
 }
+*/
 
 
 .sidenav {
-    height: 100%; /* 100% Full-height */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Stay on top */
-    width:0;
-    top: 0; /* Stay at the top */
+    height: 100%;            /* 100% Full-height */
+    position: fixed;         /* Stay in place */
+    z-index: 1;              /* Stay on top */
+    top: 0;                  /* Stay at the top */
     left: 0;
-    background-color: #111; /* Black*/
-    overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 60px; /* Place content 60px from the top */
-    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+    width: 30px; 
+    overflow-x: hidden;      /* Disable horizontal scroll */
+    transition: 0.5s;        /* 0.5 second transition effect to slide in the sidenav */
+    background-color: #FFF;  /* Black*/
+    border-right: thin dotted #AAA;
+ }
+
+.sidenav:hover{
+    width: 160px;
 }
-*/
+
+.sidenav a{
+    display: none;
+    text-decoration: none;
+}
+
+
+.sidenav:hover a{
+    display: inline;
+}
+#main{
+   margin-left:40px;
+}
+
 
        </style>
        <script type='text/javascript'>
@@ -374,7 +396,7 @@ function toggleFirstCheckboxExcept(root, exc){
 
        </script>
    </head>
-   <body onload='init();'>
+   <body onload='init();'><div id="main">
 """
 
 form +=  "      <h1>Worksheet for the " + root.getAttribute("name") + "</h1>"
@@ -383,6 +405,14 @@ form += state.descend(root)
 form += """
       <br/>
       <button type="button" onclick="generateReport()">Generate Report</button>
+    </div> <!-- End of main -->
+   <div class="sidenav">
+   <div style="font-size: xx-large">&#187;</div>
+
+"""
+form += state.index
+form +="""
+   </div>
 
    </body>
 </html>
