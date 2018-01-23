@@ -47,9 +47,9 @@ class State:
                                 onChange+=delim+"\""+sel+"\""
                                 delim=","
                             onChange+="]);"
-                        chk+= " onchange='"+onChange+"'";
+                        chk+= " onchange='update(); "+onChange+"'";
                         chk+= " data-rindex='"+str(rindex)+"'"
-                        chk +=" class='"+classes+"'"
+                        chk +=" class='val "+classes+"'"
                         chk +=">"+ contents+"</input>\n";
                         sels.append(chk)
                         rindex+=1
@@ -63,7 +63,7 @@ class State:
                     ret+="</ul>\n"
                 ret+="</span>"
             elif node.tagName == "assignable":
-                ret += "<textarea class='assignment' rows='1' placeholder='"
+                ret += "<textarea onchange='update();' class='assignment val' rows='1' placeholder='"
                 ret += ' '.join(self.title_to_form(node).split())
                 ret +="'></textarea>"
 
@@ -114,14 +114,15 @@ class State:
                     if "SFRs" == idAttr or "SARs" == idAttr:
                         ret+="<h2>"+node.getAttribute("title")+"</h2>\n"
                 elif node.tagName == "f-component" or node.tagName == "a-component":
-                    ret+="<div id='"+node.getAttribute("id")+"'"
+                    id=node.getAttribute("id")
+                    ret+="<div id='"+id+"'"
                     # The only direct descendants are possible should be the children
                     child=node.getElementsByTagNameNS('https://niap-ccevs.org/cc/v1', 
                                                 'selection-depends')
                     if child.length > 0:
                         ret+=" class='disabled'"
                     ret+=">"
-                    ret+="<h3>"+node.getAttribute("name")+"</h3>\n"
+                    ret+="<h3>"+id+" &mdash; "+ node.getAttribute("name")+"</h3>\n"
                     ret+=self.descend(node)
                     ret+="</div>"
                     continue
@@ -153,15 +154,77 @@ form =  "<html xmlns='http://www.w3.org/1999/xhtml'>\n   <head>"
 form += "<meta charset='utf-8'></meta><title>"+root.getAttribute("name")+"</title>"
 form += """
        <style type="text/css">
-           .disabled {
-              opacity: .2;
-	      pointer-events: none;
-           }
+.disabled {
+   opacity: .2;
+   pointer-events: none;
+}
+/*
+.disabled *{
+   display: none;
+}
+
+
+.sidenav {
+    height: 100%; /* 100% Full-height */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    width:0;
+    top: 0; /* Stay at the top */
+    left: 0;
+    background-color: #111; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+*/
+
        </style>
        <script type='text/javascript'>
 
 const AMPERSAND=String.fromCharCode(38);
 const LT=String.fromCharCode(60);
+
+var cookieJar=[];
+
+function init(){
+    createCookie("testname", "testvalue");
+    cookieJar = readAllCookies();
+    console.log("CookieJar size is "+cookieJar.length);
+    var key;
+    for (key in cookieJar) {
+       let value = cookieJar[key];
+       console.log("cookieJar["+key+"]="+value);
+    }
+    
+}
+
+function readAllCookies() {
+        ret=[];
+	var ca = document.cookie.split(';');
+        var aa,bb;
+	for(aa=0;aa != ca.length; aa++) {
+            if (3>ca[aa].length){ continue;}
+            var blah=ca[aa].split('=');
+            if (2 != blah.length){
+               console.log("Malformed Cookie.");
+               continue;
+            }
+            ret[blah[0]]=decodeURIComponent(blah[1]);
+	}
+        return ret;
+}
+
+function createCookie(name,value) {
+        var date = new Date();
+        // 180 day timeout
+ 	date.setTime(date.getTime()+(180*24*60*60*1000));
+	var expires = "; expires="+date.toGMTString();
+	document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=/";
+}
+
+function eraseCookie(name) {
+	createCookie(name,"",-1);
+}
 
 function generateReport(){
     var report = LT+"?xml version='1.0' encoding='utf-8'?>\\n"
@@ -189,12 +252,12 @@ function getRequirement(node){
               ret+=LT+"/selectable>";
            }
        }
-       else if(node.getAttribute("class") == "selectables"){
+       else if(node.classList.contains("selectables")){
            ret+=LT+"selectables>"
            ret+=getRequirements(node.children);
            ret+=LT+"/selectables>"
        }
-       else if(node.getAttribute("class") == "assignment"){
+       else if(node.classList.contains("assignment")){
            var val = "";
            if(node.value){
              val=node.value;
@@ -278,9 +341,22 @@ function updateDependency(root, ids){
          document.getElementById(id).classList.remove('disabled');
       }
       else{
-         document.getElementById(d).classList.add('disabled');
+         document.getElementById(id).classList.add('disabled');
       }
    }
+}
+
+var sched;
+function update(){
+   if (sched != undefined){
+      clearTimeout(sched);
+   }
+   sched = setTimeout(saveVals, 1000);
+}
+
+function saveVals(){
+   console.log("Saving off values.");
+   sched = undefined;
 }
 
 function toggleFirstCheckboxExcept(root, exc){
@@ -298,7 +374,7 @@ function toggleFirstCheckboxExcept(root, exc){
 
        </script>
    </head>
-   <body>
+   <body onload='init();'>
 """
 
 form +=  "      <h1>Worksheet for the " + root.getAttribute("name") + "</h1>"
