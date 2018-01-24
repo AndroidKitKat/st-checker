@@ -208,61 +208,95 @@ const LT=String.fromCharCode(60);
 
 var cookieJar=[];
 
-function init(){
-    createCookie("testname", "testvalue");
-    cookieJar = readAllCookies();
-    console.log("CookieJar size is "+cookieJar.length);
-    var key;
-    for (key in cookieJar) {
-       let value = cookieJar[key];
-       console.log("cookieJar["+key+"]="+value);
+function performActionOnVals(fun){
+    // Run through all the elements with possible
+    // values
+    var aa;
+    var elems = document.getElementsByClassName("val");
+    for(aa=0; elems.length> aa; aa++){
+       fun(elems[aa], "v_"+aa);
     }
-    
+}
+
+function isCheckbox(elem){
+    return elem.getAttribute("type") == "checkbox";
+}
+
+function saveToCookieJar(elem, id){
+    console.log("Saving off to |"+id+"|");
+    if( isCheckbox(elem)){
+        var val=(elem.checked?"true":"false");
+        console.log("Saving it to: "+val);
+        cookieJar[id]=elem.checked;
+    }
+    else{
+        cookieJar[id]=elem.textContent;
+    }
+}
+
+function retrieveFromCookieJar(elem, id){
+    if( isCheckbox(elem)){
+        elem.checked= (cookieJar[id] == "true");
+    }
+    else{
+        elem.textContent= cookieJar[id];
+    }
+}
+
+function init(){
+    cookieJar = readAllCookies();
+    performActionOnVals(retrieveFromCookieJar);
 }
 
 function readAllCookies() {
         ret=[];
 	var ca = document.cookie.split(';');
+        console.log("Cookies are " + document.cookie);
         var aa,bb;
 	for(aa=0;aa != ca.length; aa++) {
-            if (3>ca[aa].length){ continue;}
+//            if (3>ca[aa].length){ continue;}
             var blah=ca[aa].split('=');
             if (2 != blah.length){
                console.log("Malformed Cookie.");
                continue;
             }
-            ret[blah[0]]=decodeURIComponent(blah[1]);
+            key=blah[0].trim();
+            val=decodeURIComponent(blah[1]);
+            console.log("Reading " + val+" for |" + key+"|");
+            ret[key]=val;
 	}
         return ret;
 }
 
 function saveAllCookies(cookies){
-    var ca = document.cookie.split(';');
-    var aa,bb;
-    // Delete all existing cookies
-    for(aa=0;aa != ca.length; aa++) {
-       if (3>ca[aa].length){ continue;}
-       var blah=ca[aa].split('=');
-       if (2 != blah.length)  continue;
-       eraseCookie( blah[0] );
-    }
-    // Save off everything in the cookie jar
+//    var ca = document.cookie.split(';');
+//    var aa,bb;
+//    // Delete all existing cookies
+//    for(aa=0;aa != ca.length; aa++) {
+//       if (3>ca[aa].length){ continue;}
+//       var blah=ca[aa].split('=');
+//       if (2 != blah.length)  continue;
+//       eraseCookie( blah[0] );
+//    }
+//    // Save off everything in the cookie jar
     var key;
     for (key in cookies) {
+       console.log("Saving off " + cookies[key] + " to "+key);
        createCookie(key, cookies[key] );
     }
 }
 
 function createCookie(name,value) {
-        var date = new Date();
-        // 180 day timeout
- 	date.setTime(date.getTime()+(180*24*60*60*1000));
-	var expires = "; expires="+date.toGMTString();
-	document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=/";
+    var date = new Date();
+    // 10 day timeout
+    date.setTime(date.getTime()+(10*24*60*60*1000));
+    var expires = "; expires="+date.toGMTString();
+    document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=/";
+    console.log("COokeis are " + document.cookie);
 }
 
 function eraseCookie(name) {
-	createCookie(name,"",-1);
+    createCookie(name,"",-1);
 }
 
 function generateReport(){
@@ -284,7 +318,7 @@ function getRequirements(nodes){
 function getRequirement(node){
     var ret = ""
     if(node.nodeType==1){
-       if(node.getAttribute("type") == "checkbox"){
+       if(isCheckbox(node)){
            if(node.checked){
               ret+=LT+"selectable index='"+node.getAttribute('data-rindex')+"'>"; 
               ret+=getRequirements(node.children);
@@ -387,20 +421,22 @@ function updateDependency(root, ids){
 
 var sched;
 function update(){
-   if (sched != undefined){
-      clearTimeout(sched);
-   }
-   sched = setTimeout(saveVals, 1000);
+
+//   if (sched != undefined){
+//      clearTimeout(sched);
+//   }
+//   sched = setTimeout(saveVals, 1000);
 }
 
 function saveVals(){
-   console.log("Saving off values.");
+   performActionOnVals(saveToCookieJar);
+   saveAllCookies(cookieJar);
    sched = undefined;
 }
 
 function toggleFirstCheckboxExcept(root, exc){
    if (root == exc) return;
-   if (root.getAttribute("type") == "checkbox"){
+   if ( isCheckbox(root)){
       root.disabled=exc.checked;
       return;
    }
@@ -422,6 +458,7 @@ form += state.descend(root)
 form += """
       <br/>
       <button type="button" onclick="generateReport()">Generate Report</button>
+      <button type="button" onclick="saveVals()">SaveOff</button>
     </div> <!-- End of main -->
    <div class="sidenav">
    <div style="font-size: xx-large">&#187;</div>
