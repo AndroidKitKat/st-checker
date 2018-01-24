@@ -175,7 +175,7 @@ form += """
     z-index: 1;              /* Stay on top */
     top: 0;                  /* Stay at the top */
     left: 0;
-    width: 30px; 
+    width: 40px; 
     overflow-x: hidden;      /* Disable horizontal scroll */
     transition: 0.5s;        /* 0.5 second transition effect to slide in the sidenav */
     background-color: #FFF;  /* Black*/
@@ -196,7 +196,7 @@ form += """
     display: inline;
 }
 #main{
-   margin-left:40px;
+   margin-left:50px;
 }
 
 
@@ -227,8 +227,10 @@ function saveToCookieJar(elem, id){
         cookieJar[id]=elem.checked;
     }
     else{
-        console.log("Saving " + elem.value + " to " + id + "("+elem.tagName+")");
-        cookieJar[id]=elem.value;
+        if(elem.value != undefined && elem.value != "undefined" ){
+           console.log("Saving " + elem.value + " to " + id + "("+elem.tagName+")");
+           cookieJar[id]=elem.value;
+        }
     }
 }
 
@@ -237,7 +239,9 @@ function retrieveFromCookieJar(elem, id){
         elem.checked= (cookieJar[id] == "true");
     }
     else{
-        elem.value= cookieJar[id];
+        if( id in cookieJar && cookieJar[id] != "undefined"){
+            elem.value= cookieJar[id];
+        }
     }
 }
 
@@ -289,8 +293,9 @@ function createCookie(name,value) {
     // 10 day timeout
     date.setTime(date.getTime()+(10*24*60*60*1000));
     var expires = "; expires="+date.toGMTString();
+    console.log("Creating: " + name+"="+encodeURIComponent(value)+expires+"; path=/");
     document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=/";
-//    console.log("COokeis are " + document.cookie);
+
 }
 
 function eraseCookie(name) {
