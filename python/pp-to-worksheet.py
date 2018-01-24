@@ -117,7 +117,7 @@ class State:
                         ret+="<h2>"+node.getAttribute("title")+"</h2>\n"
                 elif node.tagName == "f-component" or node.tagName == "a-component":
                     id=node.getAttribute("id")
-                    self.index+="<a href='#"+id+"'>"+id+"</a><br/>\n"
+                    self.index+="<tr><td>&#x2714;</td><td><a href='#"+id+"'>"+id+"</a></td></tr>\n"
 
                     ret+="<div id='"+id+"'"
                     # The only direct descendants are possible should be the children
@@ -234,6 +234,23 @@ function readAllCookies() {
             ret[blah[0]]=decodeURIComponent(blah[1]);
 	}
         return ret;
+}
+
+function saveAllCookies(cookies){
+    var ca = document.cookie.split(';');
+    var aa,bb;
+    // Delete all existing cookies
+    for(aa=0;aa != ca.length; aa++) {
+       if (3>ca[aa].length){ continue;}
+       var blah=ca[aa].split('=');
+       if (2 != blah.length)  continue;
+       eraseCookie( blah[0] );
+    }
+    // Save off everything in the cookie jar
+    var key;
+    for (key in cookies) {
+       createCookie(key, cookies[key] );
+    }
 }
 
 function createCookie(name,value) {
@@ -408,10 +425,11 @@ form += """
     </div> <!-- End of main -->
    <div class="sidenav">
    <div style="font-size: xx-large">&#187;</div>
-
+     <table>
 """
 form += state.index
 form +="""
+     </table>
    </div>
 
    </body>
