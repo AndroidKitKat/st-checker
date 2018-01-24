@@ -223,14 +223,12 @@ function isCheckbox(elem){
 }
 
 function saveToCookieJar(elem, id){
-    console.log("Saving off to |"+id+"|");
     if( isCheckbox(elem)){
-        var val=(elem.checked?"true":"false");
-        console.log("Saving it to: "+val);
         cookieJar[id]=elem.checked;
     }
     else{
-        cookieJar[id]=elem.textContent;
+        console.log("Saving " + elem.value + " to " + id + "("+elem.tagName+")");
+        cookieJar[id]=elem.value;
     }
 }
 
@@ -239,7 +237,7 @@ function retrieveFromCookieJar(elem, id){
         elem.checked= (cookieJar[id] == "true");
     }
     else{
-        elem.textContent= cookieJar[id];
+        elem.value= cookieJar[id];
     }
 }
 
@@ -254,7 +252,7 @@ function readAllCookies() {
         console.log("Cookies are " + document.cookie);
         var aa,bb;
 	for(aa=0;aa != ca.length; aa++) {
-//            if (3>ca[aa].length){ continue;}
+            if (3>ca[aa].length){ continue;}
             var blah=ca[aa].split('=');
             if (2 != blah.length){
                console.log("Malformed Cookie.");
@@ -262,7 +260,7 @@ function readAllCookies() {
             }
             key=blah[0].trim();
             val=decodeURIComponent(blah[1]);
-            console.log("Reading " + val+" for |" + key+"|");
+//            console.log("Reading " + val+" for |" + key+"|");
             ret[key]=val;
 	}
         return ret;
@@ -281,7 +279,7 @@ function saveAllCookies(cookies){
 //    // Save off everything in the cookie jar
     var key;
     for (key in cookies) {
-       console.log("Saving off " + cookies[key] + " to "+key);
+//       console.log("Saving off " + cookies[key] + " to "+key);
        createCookie(key, cookies[key] );
     }
 }
@@ -292,7 +290,7 @@ function createCookie(name,value) {
     date.setTime(date.getTime()+(10*24*60*60*1000));
     var expires = "; expires="+date.toGMTString();
     document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=/";
-    console.log("COokeis are " + document.cookie);
+//    console.log("COokeis are " + document.cookie);
 }
 
 function eraseCookie(name) {
@@ -422,10 +420,10 @@ function updateDependency(root, ids){
 var sched;
 function update(){
 
-//   if (sched != undefined){
-//      clearTimeout(sched);
-//   }
-//   sched = setTimeout(saveVals, 1000);
+   if (sched != undefined){
+     clearTimeout(sched);
+   }
+   sched = setTimeout(saveVals, 1000);
 }
 
 function saveVals(){
@@ -458,7 +456,6 @@ form += state.descend(root)
 form += """
       <br/>
       <button type="button" onclick="generateReport()">Generate Report</button>
-      <button type="button" onclick="saveVals()">SaveOff</button>
     </div> <!-- End of main -->
    <div class="sidenav">
    <div style="font-size: xx-large">&#187;</div>
@@ -472,5 +469,6 @@ form +="""
    </body>
 </html>
 """
+#      <button type="button" onclick="saveVals()">SaveOff</button>
 
 print(form)
