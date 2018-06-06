@@ -5,3 +5,10 @@ input/*.html
 input/schemas.xml
 input/os.rnc
 LocalUser.make
+.vscode
+.mypy_cache
+input/docxfile.docx
+input/odtfile.odt
+input/pdffile.pdf
+input/
+python/__pycache__/
