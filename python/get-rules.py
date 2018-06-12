@@ -1,5 +1,8 @@
-import lxml.etree
-
+try:
+	import lxml.etree
+except ImportError:
+	raise ImportError('this will not work without lxml installed. Please install lxml in a virtual python environment using `pip install lxml')
+##needs improvement
 def parseRules(ruleFile):
 	with open(ruleFile) as ruleSheet:
 			xml = lxml.etree.fromstring(ruleSheet.read())
