@@ -12,10 +12,23 @@ import sys
 import re
 import os
 import subprocess
+import platform
+try:
+    import lxml.etree
+except ImportError:
+    raise ImportError('st-checker.py will not work without lxml installed. Install lxml and try again.')
+
+if not os.path.exists('congfig.yml'):
+    print("Run config.py before running st-checker.py")
+    sys.exit(0)
 
 #firstly checks the args before even loading the rest of the program
 if len(sys.argv) != 2:
     print("Usage: <st-checker.py> <protection-profile>") #will have to double check this
+    sys.exit(0)
+
+if platform.system() == 'Windows':
+    print("Right now, st-checker only works on Linux and macOS. If you are seeing this and you are running Linux or macOS, I did something wrong.  ")
     sys.exit(0)
 
 #gets input file and makes sure its valid
@@ -66,7 +79,7 @@ def parseDocx(inDoc):
 
 def parsePdf(inPdf):
     print("parsePdf is being called")
-    subprocess.Popen(['pdftotext', sys.argv[-1],'temp.txt'])
+    subprocess.Popen(['pdftotext', sys.argv[-1],'temp/temp.txt'])
     rippedpdf = []
     with open('temp/temp.txt') as temp:
         for line in temp:
@@ -74,5 +87,28 @@ def parsePdf(inPdf):
             rippedpdf.append(line.strip('\n'))
     return [item for item in rippedpdf if item]
 
+
+#def findRulesTemplate():
+
+def generateRuleSheet():
+    subprocess.Popen(['xsltproc', '-o', 'rules/OsRules.xsl', 'xsl/RuleGenerator.xsl', '~/Documents/operatingsystem/input/operatingsystem.xml'])
+
+def getRulesFromSheet(ruleFile):
+	with open(ruleFile) as ruleSheet:
+			xml = lxml.etree.fromstring(ruleSheet.read())
+			badRules = xml.xpath('.//axsl:when/@test', namespaces=xml.nsmap)
+			goodRules = []
+			for item in badRules:
+				item = repr(item)
+				item = item.replace('//*[@id=\'','')
+				item = item.replace('\']','')
+				item = item.strip('\"')
+				goodRules.append(item)
+	return(goodRules)
 userInput = getInput(sys.argv[-1])
-print(userInput)
+
+if not os.path.exists('rules/OsRules.xsl'):
+    generateRuleSheet()
+
+
+#rulesList = getRulesFromSheet(file)
