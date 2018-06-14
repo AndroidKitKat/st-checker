@@ -24,17 +24,17 @@ def getInput(inputFile):
     fileName = re.sub('^(.*[\\\/])','',absFilePath)
 
     if fileExtension.lower() == ('.docx'):
-        parseDocx(sys.argv[-1])
+        return parseDocx(sys.argv[-1])
         #fileparse.docxparse(sys.argv[-1], 'output/rippedWord.txt')
-        print("doc")
+        #print("doc")
     elif fileExtension.lower() == ('.pdf'):
         #fileparse.pdfparse(sys.argv[-1],'output/rippedpdf.txt')
-        parsePdf(sys.argv[-1])
-        print("pdf")
+        return parsePdf(sys.argv[-1])
+        #print("pdf")
     else:
         print("File must be .docx or .pdf")
         sys.exit(0)
-
+    
 def parseDocx(inDoc):
     print("parseDocx is being called")
     import zipfile
@@ -62,9 +62,17 @@ def parseDocx(inDoc):
                 if node.text]
         if texts:
             paragraphs.append(''.join(texts))
-    return(paragraphs) ### this should be a list of all the stuff        
+    return paragraphs ### this should be a list of all the stuff        
 
 def parsePdf(inPdf):
-    
+    print("parsePdf is being called")
+    subprocess.Popen(['pdftotext', sys.argv[-1],'temp.txt'])
+    rippedpdf = []
+    with open('temp/temp.txt') as temp:
+        for line in temp:
+            #line = line.strip('\n')
+            rippedpdf.append(line.strip('\n'))
+    return [item for item in rippedpdf if item]
 
-getInput(sys.argv[-1])
+userInput = getInput(sys.argv[-1])
+print(userInput)
