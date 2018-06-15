@@ -18,7 +18,7 @@ try:
 except ImportError:
     raise ImportError('st-checker.py will not work without lxml installed. Install lxml and try again.')
 
-if not os.path.exists('congfig.yml'):
+if not os.path.exists('congfig.json'):
     print("Run config.py before running st-checker.py")
     sys.exit(0)
 

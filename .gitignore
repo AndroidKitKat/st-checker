@@ -15,4 +15,4 @@ python/__pycache__/
 sandbox/
 rules/
 temp/
-config.ini
+config.json
