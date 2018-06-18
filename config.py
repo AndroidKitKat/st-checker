@@ -23,17 +23,18 @@ def detectConfig():
 
 def generateConfig():
     with open('config.json', 'w+') as configFile:
-        path = input('Input the path to the \'operatingsystems\' repo (if unsure, press return): ')
-        if os.path.exists(path):
+        path = input('Input the path (from root) to the \'operatingsystem\' repo, ending with a \'/\', (if unsure, press return): ')
+        print(path)
+        if os.path.exists(path + 'input/operatingsystem.xml'):
             data['os_path'].append(path)
             data['found'].append('1')
             json.dump(data,configFile,indent = 2)
         else:
-            findAndDL = input('Unable to find \'operatingsystems\' repo. A potentially outdated one will be downloaded and used.\nContinue? (y/n):')
+            findAndDL = input('Unable to find \'operatingsystem\' repo. A potentially outdated one will be downloaded and used.\nContinue? (y/n):')
             while not (findAndDL.startswith('y') or findAndDL.startswith('n')):
                 findAndDL = input('Try again (y/n): ').lower()
             if findAndDL.startswith('y'):   # etc.
-                subprocess.Popen(['curl','-so','rules/OsRules.xsl','https://github.com/AndroidKitKat/st-checker/releases/download/whyDoINeedThis/OsRules.xsl'])
+                subprocess.Popen(['curl','-soc','rules/OsRules.xsl','https://github.com/AndroidKitKat/st-checker/releases/download/whyDoINeedThis/OsRules.xsl'])
                 data['os_path'].append('rules/OsRules')
                 data['found'].append('0')
                 json.dump(data,configFile,indent = 2)
