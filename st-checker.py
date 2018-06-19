@@ -7,7 +7,6 @@ st-checker is a WIP and gives no warranty
 
 If you'd like to report a problem, please file an issue on either this repository or the main repo, and someone will try to correct that issue asap
 """
-
 import sys
 import re
 import os
@@ -42,7 +41,6 @@ if platform.system() == 'Windows':
     print("Right now, st-checker only works on Linux and macOS. If you are seeing this and you are running Linux or macOS, I did something wrong.  ")
     sys.exit(0)
 
-#gets input file and makes sure its valid
 def getInput(inputFile):
     absFilePath, fileExtension = os.path.splitext(sys.argv[-1])
     fileName = re.sub('^(.*[\\\/])','',absFilePath)
@@ -101,7 +99,6 @@ def parsePdf(inPdf):
             rippedpdf.append(line.strip('\n'))
     return [item for item in rippedpdf if item]
 
-
 def generateRuleSheet():
     if configData[1] == '1':
         subprocess.Popen(['xsltproc', '-o', 'rules/OsRules.xsl', 'xsl/RuleGenerator.xsl', configData[0] + 'input/operatingsystem.xml'])
@@ -125,19 +122,38 @@ def getRulesFromSheet(ruleFile):
 def checkST(ruleList):
     with open('temp/temp.txt') as pprofile, open('output/'+currTime+'-output.txt', "w+") as output:
         count = 0
-        for item in ruleList:
-            if not re.match(item, pprofile.read()):
-                output.write('Missing '+ item+'\n')
-                print('Missing '+ item)
-                count = count + 1
-        if count == len(ruleList):
-            print('Security Target has matches 100% of the protection profile')
-        else:
-            print('Security Target is missing '+count+' values from the Protection Profile')
+        match = 0
+        #print(ruleList)
+        for line in pprofile:
+            for item in ruleList:
+                if item.lower() in line.lower(): #re.search(item, pprofile.readline()):
+                    #print(pprofile.readline())
+                    #print(item)
+                    output.write('balls')
+                    print(line)
+                    #print("balls")
+                    #print('Missing '+ item)
+                    match = match + 1
+                else:
+                    output.write('not balls')
+                    count = count + 1
+        print('Security Target is missing ', str(((count / len(ruleList))) * 100) ,'% of the Protection Profile')
+        print(match)
 
 def main():
     document = getInput(sys.argv[-1])
     rulesheet = generateRuleSheet()
     checkST(rulesheet)
 
-main()
+def test():
+    rulesheet = generateRuleSheet()
+    with open('temp/temp.txt') as pprofile:
+        for line in pprofile:
+            for item in rulesheet:
+                if item.lower() in line.lower():
+                    print(line)
+                    
+def cleanOutput():
+    import shutil
+    shutil.rmtree('output/')
+    os.makedirs('output/')
