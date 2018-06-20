@@ -16,3 +16,4 @@ sandbox/
 rules/
 temp/
 config.json
+Makefile

@@ -15,18 +15,31 @@ import platform
 import json
 import time
 
-startTime = time.time()
 currTime = time.strftime("%Y-%m-%d %H:%M:%S")
 
+try:
+    import lxml.etree
+except ImportError:
+    try:
+        import xml.etree.cElementTree as etree
+    except ImportError:
+        try:
+            import xml.etree.ElementTree as etree
+        except ImportError:
+            try:
+                import cElementTree as etree
+            except ImportError:
+                try:
+                    import elementtree.ElementTree as etree
+                except ImportError:
+                    print("Failed to import the proper ElementTree libraries needed. Install \'lxml\' from pip for greatest compatibility.")
+                    sys.exit(0)
+    print('Running in compatibility mode. st-checker may not work entirely as expected. This can be resolved by installing \'lxml\' from pip.')
 
 with open('config.json') as configFile:  
     data = json.load(configFile)
     configData = (data['os_path'] + data['found'])
 
-try:
-    import lxml.etree
-except ImportError:
-    raise ImportError('st-checker.py will not work without lxml installed. Install lxml and try again.')
 
 if not os.path.exists('config.json'):
     print("Run config.py before running st-checker.py")
@@ -129,21 +142,21 @@ def checkST(ruleList):
                 if item.lower() in line.lower(): #re.search(item, pprofile.readline()):
                     #print(pprofile.readline())
                     #print(item)
-                    output.write('balls')
-                    print(line)
+                    output.write('PP has '+item+'\n')
                     #print("balls")
                     #print('Missing '+ item)
-                    match = match + 1
                 else:
-                    output.write('not balls')
+                    output.write('PP is missing '+item+'\n')
                     count = count + 1
         print('Security Target is missing ', str(((count / len(ruleList))) * 100) ,'% of the Protection Profile')
-        print(match)
 
-def main():
+def main():    
     document = getInput(sys.argv[-1])
     rulesheet = generateRuleSheet()
     checkST(rulesheet)
+    clean = 0
+    if clean == 1:
+        cleanOutput()
 
 def test():
     rulesheet = generateRuleSheet()
@@ -157,3 +170,5 @@ def cleanOutput():
     import shutil
     shutil.rmtree('output/')
     os.makedirs('output/')
+
+main()
