@@ -10,7 +10,7 @@ I'm somewhat familiar with a RelaxNG Schema
 This is currrently a WIP, and improvements are (always) coming.
 
 ### Instructions:
-1. Run `config.py` to generate a `config.yml`
+1. Run `config.py` to generate a `config.json`
 2. Run `$ python st-checker.py <protection-file>`
 3. ???
 4. Profit. 
