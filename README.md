@@ -17,6 +17,8 @@ This is currrently a WIP, and improvements are (always) coming.
 
 If you have problems with `st-checker.py` thinking you are on Windows and you aren't on Windows, then edit  `config.yml` to reflect that. The only time I *think* this might happen is if you're using the **Windows Subsystem for Linux**.
 
+Also, ignore anything about your linter saying some things are already defined in the import section. This is for best compatibility that i use this naming scheme.
+
 Sidenote: this currently gets its rules from the operatingsystems repo, not sure if this is the ruleset I want to use, and it might work with a different ruleset. I'm not sure.
 
 Any other bugs? Feel free to leave an issue on the issue tab on the [GitHub repo](https://www.github.com/AndroidKitKat/st-checker). I'll do my best to make sure any issues get sorted out.
