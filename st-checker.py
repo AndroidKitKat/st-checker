@@ -36,14 +36,14 @@ except ImportError:
                     sys.exit(0)
     print('Running in compatibility mode. st-checker may not work entirely as expected. This can be resolved by installing \'lxml\' from pip.')
 
-with open('config.json') as configFile:  
-    data = json.load(configFile)
-    configData = (data['os_path'] + data['found'])
+# with open('config.json') as configFile:  
+#     data = json.load(configFile)
+#     configData = (data['os_path'] + data['found'])
 
 
-if not os.path.exists('config.json'):
-    print("Run config.py before running st-checker.py")
-    sys.exit(0)
+# if not os.path.exists('config.json'):
+#     print("Run config.py before running st-checker.py")
+#     sys.exit(0)
 
 #firstly checks the args before even loading the rest of the program
 if len(sys.argv) != 2:
@@ -112,12 +112,18 @@ def parsePdf(inPdf):
             rippedpdf.append(line.strip('\n'))
     return [item for item in rippedpdf if item]
 
-def generateRuleSheet():
-    if configData[1] == '1':
-        subprocess.Popen(['xsltproc', '-o', 'rules/OsRules.xsl', 'xsl/RuleGenerator.xsl', configData[0] + 'input/operatingsystem.xml'])
-    elif configData[1] == '0':
-        print('balls')
+# def generateRuleSheet():
+#     if configData[1] == '1':
+#         subprocess.Popen(['xsltproc', '-o', 'rules/OsRules.xsl', 'xsl/RuleGenerator.xsl', configData[0] + 'input/operatingsystem.xml'])
+#     elif configData[1] == '0':
+#         print('balls')
+#     return getRulesFromSheet('rules/OsRules.xsl')
+
+def newGenerateRuleSheet():
+    if not os.path.exists('rules/OsRules.xsl'):
+        subprocess.Popen(['curl','-soc','rules/OsRules.xsl','https://github.com/AndroidKitKat/st-checker/releases/download/whyDoINeedThis/OsRules.xsl'])
     return getRulesFromSheet('rules/OsRules.xsl')
+
 
 def getRulesFromSheet(ruleFile):
 	with open(ruleFile) as ruleSheet:
@@ -132,14 +138,15 @@ def getRulesFromSheet(ruleFile):
 				goodRules.append(item)
 	return goodRules
 
+#this is broken and i dont know why
 def checkST(ruleList):
     with open('temp/temp.txt') as pprofile, open('output/'+currTime+'-output.txt', "w+") as output:
         count = 0
         match = 0
         #print(ruleList)
-        for line in pprofile:
-            for item in ruleList:
-                if item.lower() in line.lower(): #re.search(item, pprofile.readline()):
+        for item in ruleList:
+            for line in pprofile:
+                if item.lower() in line.lower():
                     #print(pprofile.readline())
                     #print(item)
                     output.write('PP has '+item+'\n')
@@ -150,25 +157,31 @@ def checkST(ruleList):
                     count = count + 1
         print('Security Target is missing ', str(((count / len(ruleList))) * 100) ,'% of the Protection Profile')
 
+def generateSchema():
+    print('this is broken')
+
 def main():    
     document = getInput(sys.argv[-1])
-    rulesheet = generateRuleSheet()
+    rulesheet = newGenerateRuleSheet()
     checkST(rulesheet)
     clean = 0
     if clean == 1:
         cleanOutput()
 
+#this fscking works and I don't know why
 def test():
-    rulesheet = generateRuleSheet()
-    with open('temp/temp.txt') as pprofile:
+    rulesheet = newGenerateRuleSheet()
+    with open('temp/temp.txt') as pprofile, open('temp/fark1.txt','w+') as poop, open('temp/poop1.txt','w+') as fark:
         for line in pprofile:
             for item in rulesheet:
                 if item.lower() in line.lower():
-                    print(line)
+                    poop.write(line)
+                    fark.write(item+'\n')
+        
                     
 def cleanOutput():
     import shutil
     shutil.rmtree('output/')
     os.makedirs('output/')
 
-main()
+test()

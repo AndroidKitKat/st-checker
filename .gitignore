@@ -17,3 +17,4 @@ rules/
 temp/
 config.json
 Makefile
+config.py
