@@ -18,24 +18,11 @@ import time
 currTime = time.strftime("%Y-%m-%d %H:%M:%S")
 
 try:
-    import lxml.etree
+    import lxml.etree as etree
 except ImportError:
-    try:
-        import xml.etree.cElementTree as etree
-    except ImportError:
-        try:
-            import xml.etree.ElementTree as etree
-        except ImportError:
-            try:
-                import cElementTree as etree
-            except ImportError:
-                try:
-                    import elementtree.ElementTree as etree
-                except ImportError:
-                    print("Failed to import the proper ElementTree libraries needed. Install \'lxml\' from pip for greatest compatibility.")
-                    sys.exit(0)
-    print('Running in compatibility mode. st-checker may not work entirely as expected. This can be resolved by installing \'lxml\' from pip.')
-
+    print("Failed to import the proper ElementTree libraries needed. Install \'lxml\' from pip.")
+    sys.exit(0)
+# deprecated
 # with open('config.json') as configFile:  
 #     data = json.load(configFile)
 #     configData = (data['os_path'] + data['found'])
@@ -51,7 +38,7 @@ if len(sys.argv) != 2:
     sys.exit(0)
 
 if platform.system() == 'Windows':
-    print("Right now, st-checker only works on Linux and macOS. If you are seeing this and you are running Linux or macOS, I did something wrong.  ")
+    print("Right now, st-checker only works on Linux and macOS. If you are seeing this and you are running Linux or macOS, I did something wrong.")
     sys.exit(0)
 
 def getInput(inputFile):
@@ -127,7 +114,7 @@ def newGenerateRuleSheet():
 
 def getRulesFromSheet(ruleFile):
 	with open(ruleFile) as ruleSheet:
-			xml = lxml.etree.fromstring(ruleSheet.read())
+			xml = etree.fromstring(ruleSheet.read())
 			badRules = xml.xpath('.//axsl:when/@test', namespaces=xml.nsmap)
 			goodRules = []
 			for item in badRules:
@@ -157,9 +144,6 @@ def checkST(ruleList):
                     count = count + 1
         print('Security Target is missing ', str(((count / len(ruleList))) * 100) ,'% of the Protection Profile')
 
-def generateSchema():
-    print('this is broken')
-
 #this fscking works and I don't know why
 def test():
     presentRules = []
@@ -176,9 +160,16 @@ def test():
                     fark.write(item+'\n')
     presentRules = list(set(presentRules))
     missingRules = [x for x in rulesheet if x not in presentRules]
-    
 
-
+    root = etree.Element('PP_Rules')
+    xmlRules = etree.SubElement(root, 'Present_Rules')
+    xmlMissing = etree.SubElement(root, 'Missing_Rules')
+    # for item in presentRules:
+    #     xmlRules.append(etree.Element(item))
+    # for item in missingRules:
+    #     xmlMissing.append(etree.Element(item))
+    root.write(sys.stdout, pretty_print=True)
+        
 
 def cleanOutput(clearOutput, clearTemp):
     import shutil
