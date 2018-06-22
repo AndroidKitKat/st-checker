@@ -160,28 +160,39 @@ def checkST(ruleList):
 def generateSchema():
     print('this is broken')
 
+#this fscking works and I don't know why
+def test():
+    presentRules = []
+    missingRules = []
+    lineNum = 1
+    rulesheet = newGenerateRuleSheet()
+    with open('temp/temp.txt') as pprofile, open('temp/fark1.txt','w+') as poop, open('temp/poop1.txt','w+') as fark:
+        for line in pprofile:
+            lineNum = lineNum + 1
+            for item in rulesheet:
+                if item.lower() in line.lower():
+                    presentRules.append(item)
+                    poop.write(line)
+                    fark.write(item+'\n')
+    presentRules = list(set(presentRules))
+    missingRules = [x for x in rulesheet if x not in presentRules]
+    
+
+
+
+def cleanOutput(clearOutput, clearTemp):
+    import shutil
+    if clearOutput == 0:
+        shutil.rmtree('output/')
+        os.makedirs('output/')
+    if clearTemp == 0:
+        shutil.rmtree('temp/')
+        os.makedirs('temp/')
+
 def main():    
     document = getInput(sys.argv[-1])
     rulesheet = newGenerateRuleSheet()
     checkST(rulesheet)
-    clean = 0
-    if clean == 1:
-        cleanOutput()
-
-#this fscking works and I don't know why
-def test():
-    rulesheet = newGenerateRuleSheet()
-    with open('temp/temp.txt') as pprofile, open('temp/fark1.txt','w+') as poop, open('temp/poop1.txt','w+') as fark:
-        for line in pprofile:
-            for item in rulesheet:
-                if item.lower() in line.lower():
-                    poop.write(line)
-                    fark.write(item+'\n')
-        
-                    
-def cleanOutput():
-    import shutil
-    shutil.rmtree('output/')
-    os.makedirs('output/')
+    cleanOutput(1,1)
 
 test()
