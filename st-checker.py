@@ -160,16 +160,44 @@ def test():
                     fark.write(item+'\n')
         presentRules = list(set(presentRules))
         missingRules = [x for x in rulesheet if x not in presentRules]
-
         root = etree.Element('PP_Rules')
         xmlRules = etree.SubElement(root, 'Present_Rules')
+        xmlRules.text = str(presentRules)
+        # for item in presentRules:
+        #     # etree.SubElement(xmlRules, item)
+        #     xmlRules.text.append() = item
         xmlMissing = etree.SubElement(root, 'Missing_Rules')
-        test.write((etree.tostring(root,pretty_print=True)))
+        xmlMissing.text = str(missingRules)
+        # for item in missingRules:
+        #     xmlMissing.text = item
+            # etree.SubElement(xmlMissing, item)
+        test.write((etree.tostring(root, pretty_print=True)))
+        # root = etree.Element('PP_Rules')
+        # xmlRules = etree.SubElement(root, 'Present_Rules')
+        # for item in presentRules:
+        #     xmlRules.append(item)
+        # xmlMissing = etree.SubElement(root, 'Missing_Rules')
+        # for item in missingRules:
+        #     xmlMissing.append(item)
+        # test.write((etree.tostring(root,pretty_print=True)))
     # for item in presentRules:
     #     xmlRules.append(etree.Element(item))
     # for item in missingRules:
     #     xmlMissing.append(etree.Element(item))
-    #root.write(sys.stdout, pretty_print=True)
+#     #root.write(sys.stdout, pretty_print=True)
+#     >>> st = etree.Element("state", name="New Mexico")
+# >>> etree.tostring(st)
+# '<state name="New Mexico"/>'
+# >>> co = etree.Element("county", name="Socorro")
+# >>> st.append(co)
+# >>> etree.tostring(st)
+# '<state name="New Mexico"><county name="Socorro"/></state>'
+# >>> rem = etree.Comment("Just another day in paradise.")
+# >>> st.append(rem)
+# >>> etree.tostring(st)
+# '<state name="New Mexico"><county name="Socorro"/><!-- Just another day in
+# paradise. --></state>'
+# >>> 
         
 
 def cleanOutput(clearOutput, clearTemp):
