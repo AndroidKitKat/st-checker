@@ -150,7 +150,7 @@ def test():
     missingRules = []
     lineNum = 1
     rulesheet = newGenerateRuleSheet()
-    with open('temp/temp.txt') as pprofile, open('temp/fark1.txt','w+') as poop, open('temp/poop1.txt','w+') as fark:
+    with open('temp/temp.txt') as pprofile, open('temp/fark1.txt','w+') as poop, open('temp/poop1.txt','w+') as fark, open('temp/testt.txt','wb') as test:
         for line in pprofile:
             lineNum = lineNum + 1
             for item in rulesheet:
@@ -158,17 +158,18 @@ def test():
                     presentRules.append(item)
                     poop.write(line)
                     fark.write(item+'\n')
-    presentRules = list(set(presentRules))
-    missingRules = [x for x in rulesheet if x not in presentRules]
+        presentRules = list(set(presentRules))
+        missingRules = [x for x in rulesheet if x not in presentRules]
 
-    root = etree.Element('PP_Rules')
-    xmlRules = etree.SubElement(root, 'Present_Rules')
-    xmlMissing = etree.SubElement(root, 'Missing_Rules')
+        root = etree.Element('PP_Rules')
+        xmlRules = etree.SubElement(root, 'Present_Rules')
+        xmlMissing = etree.SubElement(root, 'Missing_Rules')
+        test.write((etree.tostring(root,pretty_print=True)))
     # for item in presentRules:
     #     xmlRules.append(etree.Element(item))
     # for item in missingRules:
     #     xmlMissing.append(etree.Element(item))
-    root.write(sys.stdout, pretty_print=True)
+    #root.write(sys.stdout, pretty_print=True)
         
 
 def cleanOutput(clearOutput, clearTemp):
