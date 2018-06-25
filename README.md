@@ -11,7 +11,7 @@ This is currrently a WIP, and improvements are (always) coming.
 
 ## Dependencies
 
-* [lxml](https://lxml.de/installation.html) from [pip](https://pypi.org/project/lxml/)
+* [lxml](https://lxml.de/) from [pip](https://pypi.org/project/lxml/)
 
 * Python 3+
 
