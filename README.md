@@ -1,6 +1,6 @@
 # st-checker
 
-A fork of [st-checker] (https://github.com/commoncriteria/st-checker)
+A fork of [st-checker](https://github.com/commoncriteria/st-checker)
 
 This project derives a RelaxNG Schema for Security Targets based on a Protection Profile or Module XML document.
 
@@ -11,7 +11,7 @@ This is currrently a WIP, and improvements are (always) coming.
 
 ## Dependencies
 
-* `lxml` from `pip`
+* [lxml](https://lxml.de/installation.html) from [pip](https://pypi.org/project/lxml/)
 
 * Python 3+
 
@@ -33,4 +33,4 @@ Any other bugs? Feel free to leave an issue on the issue tab on the [GitHub repo
 
 #### License
 
-This work is "licensed" under the [UNLICENSE] (http://www.unlicense.org/). This puts my code into the public domain and allows you, the end user, change the license on this code, etc. Go bananas.
+This work is "licensed" under the [UNLICENSE](http://www.unlicense.org/). This puts my code into the public domain and allows you, the end user, change the license on this code, etc. Go bananas.
