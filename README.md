@@ -1,5 +1,7 @@
 # st-checker
 
+A fork of [st-checker] (https://github.com/commoncriteria/st-checker)
+
 This project derives a RelaxNG Schema for Security Targets based on a Protection Profile or Module XML document.
 
 ~~I also don't know what a RelaxNG Schema is.~~
@@ -7,17 +9,23 @@ I'm somewhat familiar with a RelaxNG Schema
 
 This is currrently a WIP, and improvements are (always) coming.
 
+## Dependencies
+
+* `lxml` from `pip`
+
+* Python 3+
+
+* A desire/need to use my (buggy) program
+
 ## Instructions
 
-1. Run `$ python st-checker.py <protection-file>`
+1. Run `$ python3 st-checker.py <protection-file>`
 2. ???
 3. Profit.
 
 ### Debugging
 
 If you have problems with `st-checker.py` thinking you are on Windows and you aren't on Windows, then edit  `config.yml` to reflect that. The only time I *think* this might happen is if you're using the **Windows Subsystem for Linux**.
-
-Also, ignore anything about your linter saying some things are already defined in the import section. This is for best compatibility that i use this naming scheme.
 
 Sidenote: this currently gets its rules from the operatingsystems repo, not sure if this is the ruleset I want to use, and it might work with a different ruleset. I'm not sure.
 
