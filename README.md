@@ -23,9 +23,19 @@ This is currrently a WIP, and improvements are (always) coming.
 2. ???
 3. Profit.
 
+### TODO
+
+[~] Output the desired Schemas (This 'works' but the program is far from complete)
+
+[ ] Work on Inconsistencies
+
+[ ] Make the program not impossible to read and follow
+
+[ ] Make it actually work
+
 ### Debugging
 
-If you have problems with `st-checker.py` thinking you are on Windows and you aren't on Windows, then edit  `config.yml` to reflect that. The only time I *think* this might happen is if you're using the **Windows Subsystem for Linux**.
+If you're reading this now, it probably means that my program is not working consistently. I'm trying to fix this.
 
 Sidenote: this currently gets its rules from the operatingsystems repo, not sure if this is the ruleset I want to use, and it might work with a different ruleset. I'm not sure.
 
