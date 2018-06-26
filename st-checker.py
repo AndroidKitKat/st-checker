@@ -51,7 +51,7 @@ def getInput(inputFile):
         #print("doc")
     elif fileExtension.lower() == ('.pdf'):
         #fileparse.pdfparse(sys.argv[-1],'output/rippedpdf.txt')
-        return parsePdf(sys.argv[-1])
+        return ripPdf()
         #print("pdf")
     else:
         print("File must be .docx or .pdf")
@@ -89,9 +89,10 @@ def parseDocx(inDoc):
         return paragraphs ### this should be a list of all the stuf
         # temp.write(paragraphs)      
 
-def parsePdf(inPdf):
+def ripPdf():
     # print("parsePdf is being called")
     subprocess.Popen(['pdftotext', sys.argv[-1],'temp/temp.txt'])
+def parsePdf():
     rippedpdf = []
     with open('temp/temp.txt') as temp:
         for line in temp:
@@ -126,38 +127,38 @@ def getRulesFromSheet(ruleFile):
 	return goodRules
 
 #this is broken and i dont know why
-def checkST(ruleList):
-    with open('temp/temp.txt') as pprofile, open('output/'+currTime+'-output.txt', "w+") as output:
-        count = 0
-        match = 0
-        #print(ruleList)
-        for item in ruleList:
-            for line in pprofile:
-                if item.lower() in line.lower():
-                    #print(pprofile.readline())
-                    #print(item)
-                    output.write('PP has '+item+'\n')
-                    #print("balls")
-                    #print('Missing '+ item)
-                else:
-                    output.write('PP is missing '+item+'\n')
-                    count = count + 1
-        print('Security Target is missing ', str(((count / len(ruleList))) * 100) ,'% of the Protection Profile')
 
+# def checkST(ruleList):
+#     with open('temp/temp.txt') as pprofile, open('output/'+currTime+'-output.txt', "w+") as output:
+#         count = 0
+#         match = 0
+#         #print(ruleList)
+#         for item in ruleList:
+#             for line in pprofile:
+#                 if item.lower() in line.lower():
+#                     #print(pprofile.readline())
+#                     #print(item)
+#                     output.write('PP has '+item+'\n')
+#                     #print("balls")
+#                     #print('Missing '+ item)
+#                 else:
+#                     output.write('PP is missing '+item+'\n')
+#                     count = count + 1
+#         print('Security Target is missing ', str(((count / len(ruleList))) * 100) ,'% of the Protection Profile')
 #this fscking works and I don't know why
 def test():
     presentRules = []
     missingRules = []
     lineNum = 1
     rulesheet = newGenerateRuleSheet()
-    with open('temp/temp.txt') as pprofile, open('temp/fark1.txt','w+') as poop, open('temp/poop1.txt','w+') as fark, open('temp/testt.txt','wb') as test:
+    with open('temp/temp.txt',) as pprofile, open('temp/line.txt','w+') as liner, open('temp/itemize.txt','w+') as itemize, open('temp/out.xml','wb') as test:
         for line in pprofile:
             lineNum = lineNum + 1
             for item in rulesheet:
                 if item.lower() in line.lower():
                     presentRules.append(item)
-                    poop.write(line)
-                    fark.write(item+'\n')
+                    liner.write(line)
+                    itemize.write(item+'\n')
         presentRules = list(set(presentRules))
         missingRules = [x for x in rulesheet if x not in presentRules]
         root = etree.Element('PP_Rules')
@@ -177,9 +178,6 @@ def cleanOutput(clearOutput, clearTemp):
         os.makedirs('temp/')
 
 def main():    
-    document = getInput(sys.argv[-1])
-    rulesheet = newGenerateRuleSheet()
-    checkST(rulesheet)
+    getInput(sys.argv[-1])
     cleanOutput(1,1)
-
 test()

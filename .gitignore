@@ -14,8 +14,8 @@ input/
 python/__pycache__/
 sandbox/
 rules/
-temp/
 config.json
 Makefile
 config.py
 python.py
+Good/
