@@ -22,40 +22,6 @@ try:
 except ImportError:
     print("Failed to import the proper ElementTree libraries needed. Install \'lxml\' from pip.")
     sys.exit(0)
-# deprecated
-# with open('config.json') as configFile:  
-#     data = json.load(configFile)
-#     configData = (data['os_path'] + data['found'])
-
-
-# if not os.path.exists('config.json'):
-#     print("Run config.py before running st-checker.py")
-#     sys.exit(0)
-
-#firstly checks the args before even loading the rest of the program
-if len(sys.argv) != 2:
-    print("Usage: <st-checker.py> <security-target>") #will have to double check this
-    sys.exit(0)
-
-if platform.system() == 'Windows':
-    print("Right now, st-checker only works on Linux and macOS. If you are seeing this and you are running Linux or macOS, I did something wrong.")
-    sys.exit(0)
-
-def getInput(inputFile):
-    absFilePath, fileExtension = os.path.splitext(sys.argv[-1])
-    fileName = re.sub('^(.*[\\\/])','',absFilePath)
-
-    if fileExtension.lower() == ('.docx'):
-        return parseDocx(sys.argv[-1])
-        #fileparse.docxparse(sys.argv[-1], 'output/rippedWord.txt')
-        #print("doc")
-    elif fileExtension.lower() == ('.pdf'):
-        #fileparse.pdfparse(sys.argv[-1],'output/rippedpdf.txt')
-        return ripPdf()
-        #print("pdf")
-    else:
-        print("File must be .docx or .pdf")
-        sys.exit(0)
     
 def parseDocx(inDoc):
     with open('temp/temp.txt','w+') as temp:
@@ -92,20 +58,14 @@ def parseDocx(inDoc):
 def ripPdf():
     # print("parsePdf is being called")
     subprocess.Popen(['pdftotext', sys.argv[-1],'temp/temp.txt'])
-def parsePdf():
-    rippedpdf = []
-    with open('temp/temp.txt') as temp:
-        for line in temp:
-            #line = line.strip('\n')
-            rippedpdf.append(line.strip('\n'))
-    return [item for item in rippedpdf if item]
-
-# def generateRuleSheet():
-#     if configData[1] == '1':
-#         subprocess.Popen(['xsltproc', '-o', 'rules/OsRules.xsl', 'xsl/RuleGenerator.xsl', configData[0] + 'input/operatingsystem.xml'])
-#     elif configData[1] == '0':
-#         print('balls')
-#     return getRulesFromSheet('rules/OsRules.xsl')
+#     parsePdf()
+# def parsePdf():
+#     rippedpdf = []
+#     with open('temp/temp.txt') as temp:
+#         for line in temp:
+#             #line = line.strip('\n')
+#             rippedpdf.append(line.strip('\n'))
+#     return [item for item in rippedpdf if item]
 
 def newGenerateRuleSheet():
     if not os.path.exists('rules/OsRules.xsl'):
@@ -126,25 +86,6 @@ def getRulesFromSheet(ruleFile):
 				goodRules.append(item)
 	return goodRules
 
-#this is broken and i dont know why
-
-# def checkST(ruleList):
-#     with open('temp/temp.txt') as pprofile, open('output/'+currTime+'-output.txt', "w+") as output:
-#         count = 0
-#         match = 0
-#         #print(ruleList)
-#         for item in ruleList:
-#             for line in pprofile:
-#                 if item.lower() in line.lower():
-#                     #print(pprofile.readline())
-#                     #print(item)
-#                     output.write('PP has '+item+'\n')
-#                     #print("balls")
-#                     #print('Missing '+ item)
-#                 else:
-#                     output.write('PP is missing '+item+'\n')
-#                     count = count + 1
-#         print('Security Target is missing ', str(((count / len(ruleList))) * 100) ,'% of the Protection Profile')
 #this fscking works and I don't know why
 def test():
     presentRules = []
@@ -161,6 +102,8 @@ def test():
                     itemize.write(item+'\n')
         presentRules = list(set(presentRules))
         missingRules = [x for x in rulesheet if x not in presentRules]
+        print(len(presentRules))
+        print(len(missingRules))
         root = etree.Element('PP_Rules')
         xmlRules = etree.SubElement(root, 'Present_Rules')
         xmlRules.text = str(presentRules)
@@ -168,16 +111,39 @@ def test():
         xmlMissing.text = str(missingRules)
         test.write((etree.tostring(root, pretty_print=True)))
 
-def cleanOutput(clearOutput, clearTemp):
-    import shutil
-    if clearOutput == 0:
-        shutil.rmtree('output/')
-        os.makedirs('output/')
-    if clearTemp == 0:
-        shutil.rmtree('temp/')
-        os.makedirs('temp/')
 
-def main():    
-    getInput(sys.argv[-1])
-    cleanOutput(1,1)
+# deprecated
+# with open('config.json') as configFile:  
+#     data = json.load(configFile)
+#     configData = (data['os_path'] + data['found'])
+
+
+# if not os.path.exists('config.json'):
+#     print("Run config.py before running st-checker.py")
+#     sys.exit(0)
+
+#firstly checks the args before even loading the rest of the program
+if len(sys.argv) != 2:
+    print("Usage: <st-checker.py> <security-target>") #will have to double check this
+    sys.exit(0)
+
+if platform.system() == 'Windows':
+    print("Right now, st-checker only works on Linux and macOS. If you are seeing this and you are running Linux or macOS, I did something wrong.")
+    sys.exit(0)
+
+absFilePath, fileExtension = os.path.splitext(sys.argv[-1])
+fileName = re.sub('^(.*[\\\/])','',absFilePath)
+
+if fileExtension.lower() == ('.docx'):
+    parseDocx(sys.argv[-1])
+#     #fileparse.docxparse(sys.argv[-1], 'output/rippedWord.txt')
+#     #print("doc")
+# if fileExtension.lower() == ('.pdf'):
+#     subprocess.Popen(['pdftotext', sys.argv[-1],'temp/temp.txt'])
+#     ripPdf()
+#     #print("pdf")
+# else:
+#     print("File must be .docx or .pdf")
+#     sys.exit(0)
+
 test()
