@@ -1,5 +1,5 @@
 """
-This is the main python program for st-checker
+This is not the main python program for st-checker
 
 This is a fork and continuation of www.github.com/commoncriteria/st-checker
 
@@ -12,7 +12,6 @@ import re
 import os
 import subprocess
 import platform
-import json
 import time
 
 currTime = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -22,50 +21,38 @@ try:
 except ImportError:
     print("Failed to import the proper ElementTree libraries needed. Install \'lxml\' from pip.")
     sys.exit(0)
-    
-def parseDocx(inDoc):
-    with open('temp/temp.txt','w+') as temp:
-    # print("parseDocx is being called")
-        import zipfile
-        try:
-            from xml.etree.cElementTree import XML
-        except ImportError:
-            from xml.etree.ElementTree import XML
-            print("Running in compatibility mode")
-        """
-        parseDocx is a derivative of <https://github.com/mickmaccana/python-docx>
-        """
-        WORD_NAMESPACE = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
-        PARA = WORD_NAMESPACE + 'p'
-        TEXT = WORD_NAMESPACE + 't'
 
-        document = zipfile.ZipFile(inDoc)
-        xml_content = document.read('word/document.xml')
-        document.close()
-        tree = XML(xml_content)
-        i = 0
-        paragraphs = []
-        for paragraph in tree.getiterator(PARA):
-            texts = [node.text
-                    for node in paragraph.getiterator(TEXT)
-                    if node.text]
-            if texts:
-                paragraphs.append(''.join(texts))
-                temp.write(repr(paragraphs))
-        return paragraphs ### this should be a list of all the stuf
-        # temp.write(paragraphs)      
+# def parseDocx(inDoc):
+#     with open('temp/temp.txt','w+') as temp:
+#     # print("parseDocx is being called")
+#         import zipfile
+#         try:
+#             from xml.etree.cElementTree import XML
+#         except ImportError:
+#             from xml.etree.ElementTree import XML
+#             print("Running in compatibility mode")
+#         """
+#         parseDocx is a derivative of <https://github.com/mickmaccana/python-docx>
+#         """
+#         WORD_NAMESPACE = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+#         PARA = WORD_NAMESPACE + 'p'
+#         TEXT = WORD_NAMESPACE + 't'
 
-def ripPdf():
-    # print("parsePdf is being called")
-    subprocess.Popen(['pdftotext', sys.argv[-1],'temp/temp.txt'])
-#     parsePdf()
-# def parsePdf():
-#     rippedpdf = []
-#     with open('temp/temp.txt') as temp:
-#         for line in temp:
-#             #line = line.strip('\n')
-#             rippedpdf.append(line.strip('\n'))
-#     return [item for item in rippedpdf if item]
+#         document = zipfile.ZipFile(inDoc)
+#         xml_content = document.read('word/document.xml')
+#         document.close()
+#         tree = XML(xml_content)
+#         i = 0
+#         paragraphs = []
+#         for paragraph in tree.getiterator(PARA):
+#             texts = [node.text
+#                     for node in paragraph.getiterator(TEXT)
+#                     if node.text]
+#             if texts:
+#                 paragraphs.append(''.join(texts))
+#                 temp.write(repr(paragraphs))
+#         return paragraphs ### this should be a list of all the stuf
+#         # temp.write(paragraphs)
 
 def newGenerateRuleSheet():
     if not os.path.exists('rules/OsRules.xsl'):
@@ -101,9 +88,11 @@ def test():
                     liner.write(line)
                     itemize.write(item+'\n')
         presentRules = list(set(presentRules))
+        presentRules.sort()
         missingRules = [x for x in rulesheet if x not in presentRules]
-        print(len(presentRules))
-        print(len(missingRules))
+        missingRules.sort()
+        print(len(presentRules),' present rules')
+        print(len(missingRules),' missing rules')
         root = etree.Element('PP_Rules')
         xmlRules = etree.SubElement(root, 'Present_Rules')
         xmlRules.text = str(presentRules)
@@ -113,7 +102,7 @@ def test():
 
 
 # deprecated
-# with open('config.json') as configFile:  
+# with open('config.json') as configFile:
 #     data = json.load(configFile)
 #     configData = (data['os_path'] + data['found'])
 
@@ -123,27 +112,29 @@ def test():
 #     sys.exit(0)
 
 #firstly checks the args before even loading the rest of the program
-if len(sys.argv) != 2:
-    print("Usage: <st-checker.py> <security-target>") #will have to double check this
-    sys.exit(0)
-
-if platform.system() == 'Windows':
-    print("Right now, st-checker only works on Linux and macOS. If you are seeing this and you are running Linux or macOS, I did something wrong.")
-    sys.exit(0)
-
-absFilePath, fileExtension = os.path.splitext(sys.argv[-1])
-fileName = re.sub('^(.*[\\\/])','',absFilePath)
-
-if fileExtension.lower() == ('.docx'):
-    parseDocx(sys.argv[-1])
-#     #fileparse.docxparse(sys.argv[-1], 'output/rippedWord.txt')
-#     #print("doc")
-# if fileExtension.lower() == ('.pdf'):
-#     subprocess.Popen(['pdftotext', sys.argv[-1],'temp/temp.txt'])
-#     ripPdf()
-#     #print("pdf")
-# else:
-#     print("File must be .docx or .pdf")
+# if len(sys.argv) != 2:
+#     print("Usage: <st-checker.py> <security-target>") #will have to double check this
 #     sys.exit(0)
+
+# if platform.system() == 'Windows':
+#     print("Right now, st-checker only works on Linux and macOS. If you are seeing this and you are running Linux or macOS, I did something wrong.")
+#     sys.exit(0)
+
+# absFilePath, fileExtension = os.path.splitext(sys.argv[-1])
+# fileName = re.sub('^(.*[\\\/])','',absFilePath)
+
+# if fileExtension.lower() == ('.docx'):
+#     parseDocx(sys.argv[-1])
+# #     #fileparse.docxparse(sys.argv[-1], 'output/rippedWord.txt')
+# #     #print("doc")
+# if fileExtension.lower() == ('.pdf'):
+#     inputFile = sys.argv[-1]
+#     #subprocess.Popen(['pdftotext', inputFile,'temp/temp.txt'])
+# #    os.system('pdftotext', sys.argv[-1],'temp/temp.txt')
+# #     ripPdf()
+# #     #print("pdf")
+# # else:
+# #     print("File must be .docx or .pdf")
+# #     sys.exit(0)
 
 test()
