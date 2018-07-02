@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 
-python 'python/input2txt.py' $1
-python 'python/st-checker.py'
+python3 'python/input2txt.py' $1
+python3 'python/st-checker.py'

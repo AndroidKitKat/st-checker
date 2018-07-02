@@ -19,19 +19,19 @@ This is currrently a WIP, and improvements are (always) coming.
 
 ## Instructions
 
-1. Run `$ python3 st-checker.py <protection-file>`
-2. ???
-3. Profit.
+1. Run `$ python3 python/input2txt.py <protection profile>`
+2. Run `$ python3 python/st-checker.py`
+3. ???
+4. Profit.
 
 ### TODO
 
-[~] Output the desired Schemas (This 'works' but the program is far from complete)
+[~] Output the desired Schemas (This 'works' but the program is far from complete) Still verifying the RelaxNG part, not 100% consistent.
 
-[ ] Work on Inconsistencies
+[~] Make the program not impossible to read and follow
 
-[ ] Make the program not impossible to read and follow
-
-[ ] Make it actually work
+[X] Make it actually work
+So, st-checker 'works,' it is just in a very, very early alpha stages. I'm having lots of issues trying to get it to properly work while executing one command from the terminal. I tried using a `.sh` file and a `Makefile` but both yield some weird, not desired result. Another issue I'm having is that depending on the document fed, st-checker has a hard time picking up all the rules. I'm trying to get rid of this bug. However, the thing does "work" in its current state.
 
 ### Debugging
 

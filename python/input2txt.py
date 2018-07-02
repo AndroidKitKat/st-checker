@@ -3,7 +3,7 @@ import subprocess
 import sys
 import os
 import platform
-
+         
 def parseDocx(inDoc):
     with open('temp/temp.txt','w+') as temp:
     # print("parseDocx is being called")
@@ -35,6 +35,7 @@ def parseDocx(inDoc):
                 temp.write(repr(paragraphs))
         return paragraphs ### this should be a list of all the stuf
         # temp.write(paragraphs)
+        # time.time.time.time.timep()()())(_)(_)_)(-099-09-09-09_)
 
 #firstly checks the args before even loading the rest of the program
 if len(sys.argv) != 2:
