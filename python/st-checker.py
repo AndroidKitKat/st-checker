@@ -19,7 +19,7 @@ currTime = time.strftime("%Y-%m-%d %H:%M:%S")
 try:
     import lxml.etree as etree
 except ImportError:
-    print("Failed to import the proper ElementTree libraries needed. Install \'lxml\' from pip.")
+    print("Failed to import the proper ElementTree libraries needed. Please install \'lxml\' from pip.")
     sys.exit(0)
 
 # def parseDocx(inDoc):
