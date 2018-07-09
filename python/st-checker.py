@@ -79,7 +79,7 @@ def test():
     missingRules = []
     lineNum = 1
     rulesheet = newGenerateRuleSheet()
-    with open('temp/temp.txt',) as pprofile, open('temp/line.txt','w+') as liner, open('temp/itemize.txt','w+') as itemize, open('temp/out.xml','wb') as test:
+    with open('temp/temp.txt',) as pprofile, open('temp/line.txt','w+') as liner, open('temp/itemize.txt','w+') as itemize, open('output/'+currTime+'.xml','wb') as test:
         for line in pprofile:
             lineNum = lineNum + 1
             for item in rulesheet:
