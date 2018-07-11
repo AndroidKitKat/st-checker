@@ -23,4 +23,4 @@ Makefile
 thef.py
 clean.sh
 c
-temp/
+temp/*.*

@@ -3,6 +3,10 @@ import subprocess
 import sys
 import os
 import platform
+
+def makeTemp():
+    if not os.path.exists('temp'):
+        os.mkdir('temp')
          
 def parseDocx(inDoc):
     with open('temp/temp.txt','w+') as temp:
@@ -46,6 +50,7 @@ if platform.system() == 'Windows':
     print("Right now, st-checker only works on Linux and macOS. If you are seeing this and you are running Linux or macOS, I did something wrong.")
     sys.exit(0)
 
+makeTemp()
 absFilePath, fileExtension = os.path.splitext(sys.argv[-1])
 fileName = re.sub('^(.*[\\\/])','',absFilePath)
 
@@ -54,7 +59,6 @@ if fileExtension.lower() == ('.docx'):
 if fileExtension.lower() == ('.pdf'):
     inputFile = sys.argv[-1]
     subprocess.Popen(['pdftotext', sys.argv[-1],'temp/temp.txt'])
-    #ripPdf()
-# else:
-#     print("File must be .docx or .pdf")
-#     sys.exit(0)
+else:
+    print("File must be .docx or .pdf")
+    sys.exit(0)
