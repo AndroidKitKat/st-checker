@@ -15,8 +15,6 @@ This is currrently a WIP, and improvements are (always) coming.
 
 * Python 3+
 
-* A desire/need to use my (buggy) program
-
 ## Instructions
 
 1. Run `$ python3 python/input2txt.py <protection profile>`
@@ -28,11 +26,11 @@ This is currrently a WIP, and improvements are (always) coming.
 
 [~] Output the desired Schemas (This 'works' but the program is far from complete) Still verifying the RelaxNG part, not 100% consistent.
 
-[~] Make the program not impossible to read and follow
-
 [X] Make it actually work
 
-So, st-checker 'works,' it is just in a very, very early alpha stages. I'm having lots of issues trying to get it to properly work while executing one command from the terminal. I tried using a `.sh` file and a `Makefile` but both yield some weird, not desired result. Another issue I'm having is that depending on the document fed, st-checker has a hard time picking up all the rules. I'm trying to get rid of this bug. However, the thing does "work" in its current state.
+[ ] Improve execution and accuracy
+
+[ ] Clean up codebase
 
 ### Debugging
 
@@ -41,7 +39,3 @@ If you're reading this now, it probably means that my program is not working con
 Sidenote: this currently gets its rules from the operatingsystems repo, not sure if this is the ruleset I want to use, and it might work with a different ruleset. I'm not sure.
 
 Any other bugs? Feel free to leave an issue on the issue tab on the [GitHub repo](https://www.github.com/AndroidKitKat/st-checker). I'll do my best to make sure any issues get sorted out.
-
-#### License
-
-This work is "licensed" under the [UNLICENSE](http://www.unlicense.org/). This puts my code into the public domain and allows you, the end user, change the license on this code, etc. Go bananas.
