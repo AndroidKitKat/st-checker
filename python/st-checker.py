@@ -42,7 +42,7 @@ def getRulesFromSheet(ruleFile):
 	return goodRules
 
 #this fscking works and I don't know why
-def test():
+def makeSchema():
     presentRules = []
     missingRules = []
     lineNum = 1
@@ -68,4 +68,4 @@ def test():
         xmlMissing.text = str(missingRules)
         test.write((etree.tostring(root, pretty_print=True)))
 
-test()
+makeSchema()
