@@ -22,6 +22,8 @@ This is currrently a WIP, and improvements are (always) coming.
 3. ???
 4. Profit.
 
+I know that this method of execution isn't ideal in any sense, but I am unable to execute both using a Makefile or a shell script for ease of use.
+
 ### TODO
 
 [~] Output the desired Schemas (This 'works' but the program is far from complete) Still verifying the RelaxNG part, not 100% consistent.
@@ -38,4 +40,4 @@ If you're reading this now, it probably means that my program is not working con
 
 Sidenote: this currently gets its rules from the operatingsystems repo, not sure if this is the ruleset I want to use, and it might work with a different ruleset. I'm not sure.
 
-Any other bugs? Feel free to leave an issue on the issue tab on the [GitHub repo](https://www.github.com/AndroidKitKat/st-checker). I'll do my best to make sure any issues get sorted out.
+Any other bugs? Feel free to leave an issue on the issue tab on the [GitHub repo](https://www.github.com/AndroidKitKat/st-checker/issues). I'll do my best to make sure any issues get sorted out.
