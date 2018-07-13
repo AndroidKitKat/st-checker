@@ -7,10 +7,11 @@ st-checker is a WIP and gives no warranty
 
 If you'd like to report a problem, please file an issue on either this repository or the main repo, and someone will try to correct that issue asap
 """
+
 import sys
 import re
-import os
 import subprocess
+import os
 import platform
 import time
 
