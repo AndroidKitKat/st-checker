@@ -48,7 +48,7 @@ def makeSchema():
     missingRules = []
     lineNum = 1
     rulesheet = newGenerateRuleSheet()
-    with open('temp/temp.txt',) as pprofile, open('temp/line.txt','w+') as liner, open('temp/itemize.txt','w+') as itemize, open('output/'+currTime+'.xml','wb') as test:
+    with open('temp/temp.txt',) as pprofile, open('temp/line.txt','w+') as liner, open('temp/itemize.txt','w+') as itemize, open('xml/'+currTime+'.xml','wb') as test, open('output/'+currTime+'.rng', 'wb') as relaxOut:
         for line in pprofile:
             lineNum = lineNum + 1
             for item in rulesheet:
@@ -68,4 +68,6 @@ def makeSchema():
         xmlMissing = etree.SubElement(root, 'Missing_Rules')
         xmlMissing.text = str(missingRules)
         test.write((etree.tostring(root, pretty_print=True)))
+        subprocess.Popen(['java', '-jar', 'trang.jar', '-I', 'XML', '-O', 'RNG', test.name, relaxOut.name])
+
 makeSchema()
