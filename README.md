@@ -15,6 +15,8 @@ This is currrently a WIP, and improvements are (always) coming.
 
 * Python 3+
 
+* Java
+
 ## Instructions
 
 1. Run `$ python3 python/input2txt.py <protection profile>`
