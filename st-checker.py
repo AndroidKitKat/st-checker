@@ -62,11 +62,10 @@ def makeSchema():
         missingRules.sort()
         print(len(presentRules),' present rules')
         print(len(missingRules),' missing rules')
-        root = etree.Element('PP_Rules')
+        root = etree.Element('PP_Rules')#, nsmap={None: "http://relaxng.org/ns/structure/1.0"}) 
         xmlRules = etree.SubElement(root, 'Present_Rules')
         xmlRules.text = str(presentRules)
         xmlMissing = etree.SubElement(root, 'Missing_Rules')
         xmlMissing.text = str(missingRules)
         test.write((etree.tostring(root, pretty_print=True)))
-
 makeSchema()
